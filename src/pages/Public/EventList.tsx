@@ -18,8 +18,8 @@ const PublicEventList: React.FC<PublicEventListProps> = ({ eventos }) => {
   // Get unique locations for the filter
   const locations = Array.from(new Set(eventos.map(e => e.local))).sort();
 
-  // Filter active events
-  const activeEvents = eventos.filter(e => !e.encerrado);
+  // Filter active events and hide external redirect events from public feed
+  const activeEvents = eventos.filter(e => !e.encerrado && e.tipo !== 'link_externo');
 
   // Sort by date (nearest first)
   const sortedEvents = [...activeEvents].sort((a, b) => {

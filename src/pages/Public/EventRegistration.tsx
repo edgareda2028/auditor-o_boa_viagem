@@ -59,6 +59,7 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
     // ... rest of state stays same ...
 
     isEstrangeiro: false,
+    matricula: '',
     nomeCompleto: '',
     telefone: '',
     cpf: '',
@@ -235,23 +236,26 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
 
   const isExterno = evento.tipo === 'externo' || evento.tipo === 'mobilidade';
   const isMobilidade = evento.tipo === 'mobilidade';
+  const isLinkExterno = evento.tipo === 'link_externo';
 
-  const isFormValid = isExterno
-    ? (formData.nomeCompleto.trim().length >= 3 &&
-      ((isMobilidade && formData.isEstrangeiro) || (formData.pais === 'Brasil' ? formData.telefone.length === 15 : formData.telefone.trim().length >= 8)) &&
-      ((isMobilidade && formData.isEstrangeiro) || (
-        formData.interesseGraduacao !== '' &&
-        (formData.interesseGraduacao === 'Não' || formData.cursoInteresse !== '')
-      )) &&
-      (!isMobilidade || (formData.cidade.trim() !== '' && formData.estado !== '' && formData.pais !== '')))
-    : (formData.nomeCompleto.trim().length >= 3 &&
-      (formData.pais === 'Brasil' ? formData.telefone.length === 15 : formData.telefone.trim().length >= 8) &&
-      formData.cpf.length === 14 &&
-      validateEmail(formData.email) &&
-      formData.escolaridade !== '' &&
-      (!showGradInterest || formData.interesseGraduacao !== '') &&
-      (!showHigherInterest || formData.interesseTipo !== '') &&
-      (formData.interesseGraduacao === 'Não' || formData.cursoInteresse !== ''));
+  const isFormValid = isLinkExterno
+    ? formData.matricula.trim().length >= 4
+    : isExterno
+      ? (formData.nomeCompleto.trim().length >= 3 &&
+        ((isMobilidade && formData.isEstrangeiro) || (formData.pais === 'Brasil' ? formData.telefone.length === 15 : formData.telefone.trim().length >= 8)) &&
+        ((isMobilidade && formData.isEstrangeiro) || (
+          formData.interesseGraduacao !== '' &&
+          (formData.interesseGraduacao === 'Não' || formData.cursoInteresse !== '')
+        )) &&
+        (!isMobilidade || (formData.cidade.trim() !== '' && formData.estado !== '' && formData.pais !== '')))
+      : (formData.nomeCompleto.trim().length >= 3 &&
+        (formData.pais === 'Brasil' ? formData.telefone.length === 15 : formData.telefone.trim().length >= 8) &&
+        formData.cpf.length === 14 &&
+        validateEmail(formData.email) &&
+        formData.escolaridade !== '' &&
+        (!showGradInterest || formData.interesseGraduacao !== '') &&
+        (!showHigherInterest || formData.interesseTipo !== '') &&
+        (formData.interesseGraduacao === 'Não' || formData.cursoInteresse !== ''));
 
 
 
@@ -259,36 +263,49 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
     e.preventDefault();
     if (!isFormValid) return;
 
-    const payload: any = {
-      nomeCompleto: formData.nomeCompleto,
-      telefone: formData.telefone,
-    };
+    const payload: any = {};
 
-    if (!isExterno) {
-      payload.cpf = formData.cpf;
-      payload.email = formData.email;
-      payload.escolaridade = formData.escolaridade;
-    }
+    if (isLinkExterno) {
+      payload.nomeCompleto = `Matrícula: ${formData.matricula.trim()}`;
+      payload.telefone = '00000000000';
+      payload.cpf = formData.matricula.trim();
+      payload.email = 'matricula@aluno.com';
+      payload.escolaridade = 'N/A';
+    } else {
+      payload.nomeCompleto = formData.nomeCompleto;
+      payload.telefone = formData.telefone;
 
-    if (isMobilidade) {
-      payload.cidade = formData.cidade;
-      payload.estado = formData.estado;
-      payload.pais = formData.pais;
-    }
+      if (!isExterno) {
+        payload.cpf = formData.cpf;
+        payload.email = formData.email;
+        payload.escolaridade = formData.escolaridade;
+      }
 
-    if (formData.interesseGraduacao) payload.interesseGraduacao = formData.interesseGraduacao;
-    if (formData.interesseTipo) payload.interesseTipo = formData.interesseTipo;
+      if (isMobilidade) {
+        payload.cidade = formData.cidade;
+        payload.estado = formData.estado;
+        payload.pais = formData.pais;
+      }
 
-    // Se for pós-graduação, o curso de interesse é a própria pós
-    if (formData.interesseTipo === 'Pós-graduação') {
-      payload.cursoInteresse = 'Pós-graduação';
-    } else if (formData.cursoInteresse) {
-      payload.cursoInteresse = formData.cursoInteresse;
+      if (formData.interesseGraduacao) payload.interesseGraduacao = formData.interesseGraduacao;
+      if (formData.interesseTipo) payload.interesseTipo = formData.interesseTipo;
+
+      // Se for pós-graduação, o curso de interesse é a própria pós
+      if (formData.interesseTipo === 'Pós-graduação') {
+        payload.cursoInteresse = 'Pós-graduação';
+      } else if (formData.cursoInteresse) {
+        payload.cursoInteresse = formData.cursoInteresse;
+      }
     }
 
     setIsSubmitting(true);
     onRegister(evento.id, payload)
       .then(async (result) => {
+        if (isLinkExterno && evento.linkExterno) {
+          window.location.href = evento.linkExterno;
+          return;
+        }
+
         setRegisteredInscrito(result);
         if (result.qrToken) {
           // Gerar QR Code em Base64
@@ -486,12 +503,43 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
 
           <div className="lg:col-span-5">
             <div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-2xl shadow-primary/5 border border-gray-100 lg:sticky lg:top-24">
-              <h3 className="text-2xl font-black mb-8 flex items-center gap-3">
-                <div className="size-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
-                  <span className="material-symbols-outlined text-white text-lg">edit_note</span>
-                </div>
-                {t('confirm_presence')}
-              </h3>
+              {isLinkExterno ? (
+                <>
+                  <div className="size-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                    <span className="material-symbols-outlined text-3xl font-black">link</span>
+                  </div>
+                  <h3 className="text-2xl font-black mb-2 tracking-tight">Acesso ao Link</h3>
+                  <p className="text-gray-500 mb-8 max-w-xs">{t('Informe sua matrícula abaixo para registrar seu acesso e ser redirecionado(a) imediatamente.', 'Informe sua matrícula abaixo para registrar seu acesso e ser redirecionado(a).')}</p>
+                  
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <Input
+                      label="Matrícula"
+                      placeholder="Ex: 01234567"
+                      value={formData.matricula}
+                      onChange={e => setFormData({ ...formData, matricula: e.target.value })}
+                      required
+                    />
+                    
+                    <Button
+                      type="submit"
+                      isLoading={isSubmitting}
+                      fullWidth
+                      disabled={!isFormValid || isSubmitting}
+                      variant={!isFormValid || isSubmitting ? 'secondary' : 'primary'}
+                      icon={isFormValid && !isSubmitting ? 'open_in_new' : undefined}
+                    >
+                      {isFormValid ? 'Acessar Link' : 'Informe a Matrícula'}
+                    </Button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-2xl font-black mb-8 flex items-center gap-3">
+                    <div className="size-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+                      <span className="material-symbols-outlined text-white text-lg">edit_note</span>
+                    </div>
+                    {t('confirm_presence')}
+                  </h3>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {isMobilidade && (
@@ -720,6 +768,8 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
                   </p>
                 </div>
               </form>
+              </>
+              )}
             </div>
           </div>
         </div>

@@ -9,7 +9,8 @@ export interface Evento {
   encerrado: boolean;
   inscritos: Inscrito[];
   imagem?: string;
-  tipo?: 'interno' | 'externo' | 'mobilidade';
+  tipo?: 'interno' | 'externo' | 'mobilidade' | 'link_externo';
+  linkExterno?: string;
 }
 
 export interface Inscrito {

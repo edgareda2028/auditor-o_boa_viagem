@@ -22,7 +22,8 @@ const AdminEventForm: React.FC<AdminEventFormProps> = ({ onSave, onUpload, initi
     descricao: '',
     local: 'Auditório UNINASSAU Olinda',
     imagem: '',
-    tipo: 'interno' as 'interno' | 'externo' | 'mobilidade'
+    tipo: 'interno' as 'interno' | 'externo' | 'mobilidade' | 'link_externo',
+    linkExterno: ''
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -48,7 +49,8 @@ const AdminEventForm: React.FC<AdminEventFormProps> = ({ onSave, onUpload, initi
         descricao: initialData.descricao,
         local: initialData.local,
         imagem: initialData.imagem || '',
-        tipo: initialData.tipo || 'interno'
+        tipo: initialData.tipo || 'interno',
+        linkExterno: initialData.linkExterno || ''
       });
     }
   }, [initialData]);
@@ -65,9 +67,9 @@ const AdminEventForm: React.FC<AdminEventFormProps> = ({ onSave, onUpload, initi
       const finalData = { ...formData, imagem: imageUrl };
 
       if (initialData) {
-        onSave({ ...initialData, ...finalData });
+        await onSave({ ...initialData, ...finalData });
       } else {
-        onSave(finalData);
+        await onSave(finalData);
       }
       navigate('/admin');
     } catch (error) {
@@ -75,7 +77,7 @@ const AdminEventForm: React.FC<AdminEventFormProps> = ({ onSave, onUpload, initi
       setAlertConfig({
         isOpen: true,
         title: 'Erro ao Salvar',
-        message: 'Erro ao salvar evento. Verifique a imagem e tente novamente.',
+        message: 'Erro ao salvar evento: ' + (error instanceof Error ? error.message : JSON.stringify(error)),
         type: 'error'
       });
     } finally {
@@ -138,16 +140,33 @@ const AdminEventForm: React.FC<AdminEventFormProps> = ({ onSave, onUpload, initi
             <select
               className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
               value={formData.tipo}
-              onChange={e => setFormData({ ...formData, tipo: e.target.value as 'interno' | 'externo' })}
+              onChange={e => setFormData({ ...formData, tipo: e.target.value as any })}
             >
               <option value="interno">🎓 Evento Interno (Formulário Completo)</option>
               <option value="externo">🌍 Evento Externo (Formulário Simplificado)</option>
               <option value="mobilidade">✈️ Evento de Mobilidade (Simplificado + Localização)</option>
+              <option value="link_externo">🔗 Evento de Redirecionamento (Link Externo via Matrícula)</option>
             </select>
             <p className="text-[10px] text-gray-400 font-medium">
-              Eventos externos e de mobilidade solicitam informações simplificadas, sendo que mobilidade inclui Cidade, Estado e País.
+              Eventos externos e de mobilidade solicitam informações simplificadas, sendo que mobilidade inclui Cidade, Estado e País. O evento de redirecionamento encaminha para um site externo após a captura da matrícula.
             </p>
           </div>
+
+          {formData.tipo === 'link_externo' && (
+            <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+              <Input
+                label="Link Externo de Redirecionamento"
+                type="url"
+                placeholder="Ex: https://av1.uninassau.edu.br/..."
+                value={formData.linkExterno}
+                onChange={e => setFormData({ ...formData, linkExterno: e.target.value })}
+                required={formData.tipo === 'link_externo'}
+              />
+              <p className="text-[10px] text-blue-500 font-bold mt-2">
+                * Os alunos acessarão a página, informarão a Matrícula e logo serão redirecionados para essa URL.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">Imagem do Evento (Opcional)</label>

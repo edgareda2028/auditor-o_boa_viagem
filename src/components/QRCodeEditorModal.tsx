@@ -10,18 +10,27 @@ interface QRCodeEditorModalProps {
         footer: string;
     }) => void;
     eventName: string;
+    eventType?: string;
 }
 
 const QRCodeEditorModal: React.FC<QRCodeEditorModalProps> = ({
     isOpen,
     onClose,
     onGenerate,
-    eventName
+    eventName,
+    eventType
 }) => {
-    const [mainTitle, setMainTitle] = useState('Faça sua Inscrição Online!');
-    const [subtitle, setSubtitle] = useState('Evento UNINASSAU');
-    const [instruction, setInstruction] = useState('Aponte a câmera do seu celular para o QR Code e se inscreva em segundos. Rápido, fácil e seguro!');
-    const [footer, setFooter] = useState('Inscrições gratuitas • Vagas limitadas • Garanta sua presença');
+    const isLinkExterno = eventType === 'link_externo';
+
+    const defaultTitle = isLinkExterno ? 'JÁ FEZ SUA AV1?' : 'Faça sua Inscrição Online!';
+    const defaultSubtitle = isLinkExterno ? 'Aproveite seu tempo de espera para participar da Avaliação Institucional.' : 'Evento UNINASSAU';
+    const defaultInstruction = isLinkExterno ? 'Sua opinião contribui diretamente para a melhoria da instituição e ainda garante 3 horas de atividades complementares.' : 'Aponte a câmera do seu celular para o QR Code e se inscreva em segundos. Rápido, fácil e seguro!';
+    const defaultFooter = isLinkExterno ? '☑ Garanta 3h complementares. Depois de finalizar, compareça lá no CRA.. 😉' : 'Inscrições gratuitas • Vagas limitadas • Garanta sua presença';
+
+    const [mainTitle, setMainTitle] = useState(defaultTitle);
+    const [subtitle, setSubtitle] = useState(defaultSubtitle);
+    const [instruction, setInstruction] = useState(defaultInstruction);
+    const [footer, setFooter] = useState(defaultFooter);
 
     if (!isOpen) return null;
 
@@ -36,10 +45,10 @@ const QRCodeEditorModal: React.FC<QRCodeEditorModalProps> = ({
     };
 
     const handleReset = () => {
-        setMainTitle('Faça sua Inscrição Online!');
-        setSubtitle('Evento UNINASSAU');
-        setInstruction('Aponte a câmera do seu celular para o QR Code e se inscreva em segundos. Rápido, fácil e seguro!');
-        setFooter('Inscrições gratuitas • Vagas limitadas • Garanta sua presença');
+        setMainTitle(defaultTitle);
+        setSubtitle(defaultSubtitle);
+        setInstruction(defaultInstruction);
+        setFooter(defaultFooter);
     };
 
     return (
@@ -70,10 +79,12 @@ const QRCodeEditorModal: React.FC<QRCodeEditorModalProps> = ({
                 </div>
 
                 {/* Event Info */}
-                <div className="bg-primary-light/10 px-6 py-3 border-b border-primary-light/20 flex-shrink-0">
-                    <p className="text-xs font-black text-primary uppercase tracking-widest mb-1">Evento</p>
-                    <p className="text-sm font-bold text-gray-800 line-clamp-2">{eventName}</p>
-                </div>
+                {!isLinkExterno && (
+                    <div className="bg-primary-light/10 px-6 py-3 border-b border-primary-light/20 flex-shrink-0">
+                        <p className="text-xs font-black text-primary uppercase tracking-widest mb-1">Evento</p>
+                        <p className="text-sm font-bold text-gray-800 line-clamp-2">{eventName}</p>
+                    </div>
+                )}
 
                 {/* Form - Scrollable */}
                 <div className="p-6 overflow-y-auto flex-1 space-y-5">

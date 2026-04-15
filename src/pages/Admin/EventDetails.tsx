@@ -683,6 +683,7 @@ const AdminEventDetails: React.FC<AdminEventDetailsProps> = ({ eventos, onEnd, o
           generateEventRedirectQRCode(evento, texts);
         }}
         eventName={evento.nome}
+        eventType={evento.tipo}
       />
     </div>
   );

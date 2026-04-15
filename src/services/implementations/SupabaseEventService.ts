@@ -53,6 +53,7 @@ export class SupabaseEventService implements EventService {
                     encerrado: event.status === 'encerrado',
                     imagem: event.imagem_url,
                     tipo: event.tipo || 'interno',
+                    linkExterno: event.link_externo,
                     inscritos: allRegistrations.map((reg: any) => ({
                         id: reg.id,
                         nomeCompleto: reg.nome,
@@ -129,6 +130,7 @@ export class SupabaseEventService implements EventService {
                 encerrado: event.status === 'encerrado',
                 imagem: event.imagem_url,
                 tipo: event.tipo || 'interno',
+                linkExterno: event.link_externo,
                 inscritos: allRegistrations.map((reg: any) => ({
                     id: reg.id,
                     nomeCompleto: reg.nome,
@@ -166,7 +168,8 @@ export class SupabaseEventService implements EventService {
                 local: eventoData.local,
                 imagem_url: (eventoData as any).imagem,
                 status: 'ativo',
-                tipo: (eventoData as any).tipo || 'interno'
+                tipo: (eventoData as any).tipo || 'interno',
+                link_externo: (eventoData as any).linkExterno
             }])
             .select()
             .single();
@@ -182,6 +185,7 @@ export class SupabaseEventService implements EventService {
             encerrado: false,
             imagem: data.imagem_url,
             tipo: data.tipo || 'interno',
+            linkExterno: data.link_externo,
             inscritos: []
         };
     }
@@ -198,7 +202,8 @@ export class SupabaseEventService implements EventService {
                 local: evento.local,
                 imagem_url: evento.imagem,
                 status: evento.encerrado ? 'encerrado' : 'ativo',
-                tipo: evento.tipo
+                tipo: evento.tipo,
+                link_externo: evento.linkExterno
             })
             .eq('id', evento.id)
             .select()
@@ -215,6 +220,7 @@ export class SupabaseEventService implements EventService {
             encerrado: data.status === 'encerrado',
             imagem: data.imagem_url,
             tipo: data.tipo || 'interno',
+            linkExterno: data.link_externo,
             inscritos: evento.inscritos
         };
     }

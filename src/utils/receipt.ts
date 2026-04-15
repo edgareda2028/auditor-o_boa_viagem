@@ -219,101 +219,217 @@ export const generateEventRedirectQRCode = async (
         const pageHeight = 297;
         const margin = 15;
 
-        // Background gradient (simulate with rectangles)
-        doc.setFillColor(248, 250, 252);
+        const isLinkExterno = evento.tipo === 'link_externo';
+
+        // 1. Background
+        if (isLinkExterno) {
+            doc.setFillColor(255, 255, 255); // White for link_externo
+        } else {
+            doc.setFillColor(248, 250, 252);
+        }
         doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-        // Logo
-        try {
-            doc.addImage(logo, 'PNG', pageWidth / 2 - 15, margin, 30, 12);
-        } catch (e) {
-            console.warn('Logo não carregado:', e);
+        // 2. Header Section
+        if (isLinkExterno) {
+            // Gray Header Background
+            doc.setFillColor(220, 220, 220);
+            doc.rect(0, 0, pageWidth, 40, 'F');
+
+            // Logo Centralizado e com proporção corrigida
+            try {
+                // Aumentando a altura (de 18 para 28) para não achatar
+                const logoW = 50;
+                const logoH = 28;
+                doc.addImage(logo, 'PNG', pageWidth / 2 - logoW / 2, 6, logoW, logoH);
+            } catch (e) {
+                console.warn('Logo não carregado:', e);
+            }
+
+            // Removida a faixa preta e o texto grande "UNINASSAU"
+
+            let yPos = 60;
+
+            // Title Area (Gray Box)
+            doc.setFillColor(235, 235, 235);
+            doc.rect(0, yPos - 10, pageWidth, 25, 'F');
+
+            doc.setTextColor(0, 74, 153);
+            doc.setFontSize(26);
+            doc.setFont('helvetica', 'bold');
+            doc.text(texts.mainTitle.toUpperCase(), pageWidth / 2, yPos + 2, { align: 'center' });
+
+            // Accent Line
+            doc.setFillColor(0, 74, 153);
+            doc.rect(pageWidth / 2 - 12, yPos + 8, 24, 1.2, 'F');
+
+            yPos += 25;
+
+            // Subtitle / High-level Instruction
+            doc.setTextColor(60, 60, 60);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            const subLines = doc.splitTextToSize(texts.subtitle.toUpperCase(), pageWidth - 40);
+            doc.text(subLines, pageWidth / 2, yPos, { align: 'center' });
+
+            yPos += 15;
+
+            // Optional Divider
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.2);
+            doc.line(margin + 20, yPos, pageWidth - margin - 20, yPos);
+
+            yPos += 15;
+
+            // Main Instruction Text
+            doc.setTextColor(80, 80, 80);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            const instrLines = doc.splitTextToSize(texts.instruction, pageWidth - 40);
+            doc.text(instrLines, pageWidth / 2, yPos, { align: 'center' });
+
+            yPos += 15;
+
+            // QR Code
+            const qrSize = 75;
+            const qrX = pageWidth / 2 - qrSize / 2;
+            const qrY = yPos;
+
+            // Borderless QR or light border
+            doc.setDrawColor(0, 74, 153);
+            doc.setLineWidth(0.8);
+            doc.roundedRect(qrX - 3, qrY - 3, qrSize + 6, qrSize + 6, 3, 3, 'D');
+            doc.addImage(qrCodeDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+
+            yPos += qrSize + 20;
+
+            // Footer Highlight Box (Gray)
+            doc.setFillColor(240, 240, 240);
+            const footerBoxHeight = 12;
+            doc.rect(pageWidth / 2 - 45, yPos - 8, 90, footerBoxHeight, 'F');
+
+            // Find the highlight part "Garanta 3h complementares"
+            // We'll just render it nicely.
+            doc.setTextColor(40, 40, 40);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            // Clean emojis for PDF since standard fonts don't support them
+            const cleanFooter = texts.footer.replace(/[☑😉]/g, '').trim();
+            const footerPart1 = cleanFooter.split('.')[0] + '.';
+            const footerPart2 = (cleanFooter.split('.')[1] || '').trim();
+
+            doc.text(footerPart1, pageWidth / 2, yPos, { align: 'center' });
+
+            yPos += 15;
+
+            // Dark Bottom Footer Stripe
+            doc.setFillColor(50, 50, 50);
+            doc.rect(0, 280, pageWidth, 17, 'F');
+
+            if (footerPart2) {
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(footerPart2, pageWidth / 2, 291, { align: 'center' });
+            }
+
+        } else {
+            // --- Standard Event Layout (Blue Rounded Boxes) ---
+            // Logo
+            try {
+                doc.addImage(logo, 'PNG', pageWidth / 2 - 25, margin, 50, 20);
+            } catch (e) {
+                console.warn('Logo não carregado:', e);
+            }
+
+            let yPos = margin + 28;
+
+            // Main Title Box
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
+            doc.setLineWidth(1.5);
+            const titleBoxHeight = 35;
+            doc.roundedRect(margin, yPos, pageWidth - 2 * margin, titleBoxHeight, 5, 5, 'FD');
+
+            // Main Title
+            doc.setTextColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            const titleLines = doc.splitTextToSize(texts.mainTitle.toUpperCase(), pageWidth - 2 * margin - 10);
+            doc.text(titleLines, pageWidth / 2, yPos + 12, { align: 'center' });
+
+            // Divider
+            doc.setFillColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
+            doc.rect(pageWidth / 2 - 10, yPos + 18, 20, 1, 'F');
+
+            // Subtitle
+            doc.setFontSize(11);
+            doc.setTextColor(51, 51, 51);
+            doc.text(texts.subtitle.toUpperCase(), pageWidth / 2, yPos + 26, { align: 'center' });
+
+            yPos += titleBoxHeight + 10;
+
+            // Standard Event Display
+            if (evento.tipo !== 'link_externo') {
+                // Event Name Box
+                doc.setFillColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
+                doc.roundedRect(margin, yPos, pageWidth - 2 * margin, 22, 4, 4, 'F');
+
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'bold');
+                doc.text('NOME DO EVENTO', pageWidth / 2, yPos + 6, { align: 'center' });
+
+                doc.setFontSize(14);
+                const eventLines = doc.splitTextToSize(evento.nome, pageWidth - 2 * margin - 10);
+                doc.text(eventLines, pageWidth / 2, yPos + 12, { align: 'center' });
+
+                yPos += 28;
+            }
+
+            // QR Code Section Box
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(241, 245, 249);
+            doc.setLineWidth(0.8);
+            const qrBoxHeight = 110;
+            doc.roundedRect(margin, yPos, pageWidth - 2 * margin, qrBoxHeight, 5, 5, 'FD');
+
+            // Instruction text
+            doc.setTextColor(100, 116, 139);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            const instrLines = doc.splitTextToSize(texts.instruction, pageWidth - 2 * margin - 20);
+            doc.text(instrLines, pageWidth / 2, yPos + 8, { align: 'center', maxWidth: pageWidth - 2 * margin - 20 });
+
+            // QR Code
+            const qrSize = 65;
+            const qrX = pageWidth / 2 - qrSize / 2;
+            const qrY = yPos + 18;
+
+            doc.setDrawColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
+            doc.setLineWidth(1);
+            doc.roundedRect(qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 3, 3, 'D');
+            doc.addImage(qrCodeDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+
+            yPos += qrBoxHeight + 8;
+
+            // Footer section (com quebra de linha automática)
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
+            const footerMaxWidth = pageWidth - 2 * margin - 10;
+            const footerLines = doc.splitTextToSize(texts.footer.toUpperCase(), footerMaxWidth);
+            doc.text(footerLines, pageWidth / 2, yPos + 5, { align: 'center' });
+
+            const footerHeight = footerLines.length * 4;
+
+            // Bottom info
+            doc.setFontSize(7);
+            doc.setTextColor(148, 163, 184);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Sistema de Gestão de Eventos UNINASSAU', pageWidth / 2, yPos + footerHeight + 8, { align: 'center' });
+            const eventInfo = `${new Date(evento.data).toLocaleDateString('pt-BR')} às ${evento.horario} • ${evento.local}`;
+            doc.text(eventInfo, pageWidth / 2, yPos + footerHeight + 13, { align: 'center' });
         }
-
-        let yPos = margin + 20;
-
-        // Main Title Box
-        doc.setFillColor(255, 255, 255);
-        doc.setDrawColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
-        doc.setLineWidth(1.5);
-        const titleBoxHeight = 35;
-        doc.roundedRect(margin, yPos, pageWidth - 2 * margin, titleBoxHeight, 5, 5, 'FD');
-
-        // Main Title
-        doc.setTextColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
-        doc.setFontSize(24);
-        doc.setFont('helvetica', 'bold');
-        const titleLines = doc.splitTextToSize(texts.mainTitle.toUpperCase(), pageWidth - 2 * margin - 10);
-        doc.text(titleLines, pageWidth / 2, yPos + 12, { align: 'center' });
-
-        // Divider
-        doc.setFillColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
-        doc.rect(pageWidth / 2 - 10, yPos + 18, 20, 1, 'F');
-
-        // Subtitle
-        doc.setFontSize(11);
-        doc.setTextColor(51, 51, 51);
-        doc.text(texts.subtitle.toUpperCase(), pageWidth / 2, yPos + 26, { align: 'center' });
-
-        yPos += titleBoxHeight + 10;
-
-        // Event Name Box
-        doc.setFillColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
-        doc.roundedRect(margin, yPos, pageWidth - 2 * margin, 22, 4, 4, 'F');
-
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'bold');
-        doc.text('NOME DO EVENTO', pageWidth / 2, yPos + 6, { align: 'center' });
-
-        doc.setFontSize(14);
-        const eventLines = doc.splitTextToSize(evento.nome, pageWidth - 2 * margin - 10);
-        doc.text(eventLines, pageWidth / 2, yPos + 12, { align: 'center' });
-
-        yPos += 28;
-
-        // QR Code Section Box
-        doc.setFillColor(255, 255, 255);
-        doc.setDrawColor(241, 245, 249);
-        doc.setLineWidth(0.8);
-        const qrBoxHeight = 110;
-        doc.roundedRect(margin, yPos, pageWidth - 2 * margin, qrBoxHeight, 5, 5, 'FD');
-
-        // Instruction text
-        doc.setTextColor(100, 116, 139);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        const instrLines = doc.splitTextToSize(texts.instruction, pageWidth - 2 * margin - 20);
-        doc.text(instrLines, pageWidth / 2, yPos + 8, { align: 'center', maxWidth: pageWidth - 2 * margin - 20 });
-
-        // QR Code - THE IMPORTANT PART!
-        const qrSize = 65;
-        const qrX = pageWidth / 2 - qrSize / 2;
-        const qrY = yPos + 18;
-
-        // QR Code border
-        doc.setDrawColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
-        doc.setLineWidth(1);
-        doc.roundedRect(qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 3, 3, 'D');
-
-        // Add QR Code image
-        doc.addImage(qrCodeDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
-
-        yPos += qrBoxHeight + 8;
-
-        // Footer section
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(primaryColorRGB.r, primaryColorRGB.g, primaryColorRGB.b);
-        doc.text(texts.footer.toUpperCase(), pageWidth / 2, yPos + 5, { align: 'center' });
-
-        // Bottom info
-        doc.setFontSize(7);
-        doc.setTextColor(148, 163, 184);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Sistema de Gestão de Eventos UNINASSAU', pageWidth / 2, yPos + 12, { align: 'center' });
-        const eventInfo = `${new Date(evento.data).toLocaleDateString('pt-BR')} às ${evento.horario} • ${evento.local}`;
-        doc.text(eventInfo, pageWidth / 2, yPos + 17, { align: 'center' });
 
         // Save PDF
         const fileName = `qrcode-inscricao-${evento.nome.toLowerCase().replace(/\s+/g, '-')}.pdf`;
