@@ -239,7 +239,7 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
   const isLinkExterno = evento.tipo === 'link_externo';
 
   const isFormValid = isLinkExterno
-    ? formData.matricula.trim().length === 6
+    ? formData.matricula.trim().length === 8
     : isExterno
       ? (formData.nomeCompleto.trim().length >= 3 &&
         ((isMobilidade && formData.isEstrangeiro) || (formData.pais === 'Brasil' ? formData.telefone.length === 15 : formData.telefone.trim().length >= 8)) &&
@@ -456,13 +456,13 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
             <form onSubmit={handleSubmit} className="w-full space-y-6">
               <Input
                 label="Matrícula"
-                placeholder="Ex: 012345"
+                placeholder="Ex: 01234567"
                 value={formData.matricula}
                 onChange={e => {
-                  const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 8);
                   setFormData({ ...formData, matricula: val });
                 }}
-                maxLength={6}
+                maxLength={8}
                 inputMode="numeric"
                 pattern="[0-9]*"
                 required
