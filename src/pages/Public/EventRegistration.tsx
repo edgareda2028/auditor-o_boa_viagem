@@ -434,6 +434,65 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
     );
   }
 
+  if (isLinkExterno) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full animate-in">
+          <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/5 border border-gray-100 flex flex-col items-center">
+            {/* Logo Centralizada */}
+            <div className="mb-10">
+              <img src={logo} alt="Logo" className="h-16 object-contain" />
+            </div>
+
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">
+                {evento.nome.toUpperCase().includes('AV1') ? 'Acesse sua AV1' : t(evento.nome)}
+              </h2>
+              <p className="text-gray-500 text-sm">
+                {t('Informe sua matrícula abaixo para acessar.')}
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="w-full space-y-6">
+              <Input
+                label="Matrícula"
+                placeholder="Ex: 01234567"
+                value={formData.matricula}
+                onChange={e => setFormData({ ...formData, matricula: e.target.value })}
+                required
+              />
+
+              <Button
+                type="submit"
+                isLoading={isSubmitting}
+                fullWidth
+                disabled={!isFormValid || isSubmitting}
+                variant={!isFormValid || isSubmitting ? 'secondary' : 'primary'}
+                icon={isFormValid && !isSubmitting ? 'open_in_new' : undefined}
+                className="py-4 text-base rounded-2xl"
+              >
+                {isFormValid ? 'Acessar agora' : 'Informe a Matrícula'}
+              </Button>
+            </form>
+
+            <p className="mt-10 text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center">
+              Acesso Institucional Seguro
+            </p>
+          </div>
+        </div>
+
+        {/* Alert Dialog */}
+        <AlertDialog
+          isOpen={alertConfig.isOpen}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+          onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[calc(100vh-80px)] py-8 px-4">
       <div className="max-w-6xl mx-auto animate-in">
@@ -452,7 +511,7 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10">
-          <div className="lg:col-span-7 space-y-6 md:space-y-8">
+          <div className="lg:col-span-12 space-y-6 md:space-y-8">
             <div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-sm border border-gray-100">
               {/* Event Image */}
               <div className={`mb-8 -mx-6 md:-mx-10 -mt-6 md:-mt-10 ${!evento.imagem ? 'bg-primary/5 p-12 flex items-center justify-center' : ''}`}>
@@ -501,38 +560,8 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
             </div>
           </div>
 
-          <div className="lg:col-span-5">
-            <div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-2xl shadow-primary/5 border border-gray-100 lg:sticky lg:top-24">
-              {isLinkExterno ? (
-                <>
-                  <div className="size-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                    <span className="material-symbols-outlined text-3xl font-black">link</span>
-                  </div>
-                  <h3 className="text-2xl font-black mb-2 tracking-tight">Acesso ao Link</h3>
-                  <p className="text-gray-500 mb-8 max-w-xs">{t('Informe sua matrícula abaixo para registrar seu acesso e ser redirecionado(a) imediatamente.', 'Informe sua matrícula abaixo para registrar seu acesso e ser redirecionado(a).')}</p>
-                  
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <Input
-                      label="Matrícula"
-                      placeholder="Ex: 01234567"
-                      value={formData.matricula}
-                      onChange={e => setFormData({ ...formData, matricula: e.target.value })}
-                      required
-                    />
-                    
-                    <Button
-                      type="submit"
-                      isLoading={isSubmitting}
-                      fullWidth
-                      disabled={!isFormValid || isSubmitting}
-                      variant={!isFormValid || isSubmitting ? 'secondary' : 'primary'}
-                      icon={isFormValid && !isSubmitting ? 'open_in_new' : undefined}
-                    >
-                      {isFormValid ? 'Acessar Link' : 'Informe a Matrícula'}
-                    </Button>
-                  </form>
-                </>
-              ) : (
+          <div className="lg:col-span-12">
+            <div className="bg-white p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-2xl shadow-primary/5 border border-gray-100">
                 <>
                   <h3 className="text-2xl font-black mb-8 flex items-center gap-3">
                     <div className="size-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
@@ -768,8 +797,6 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
                   </p>
                 </div>
               </form>
-              </>
-              )}
             </div>
           </div>
         </div>
