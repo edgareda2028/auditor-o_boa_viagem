@@ -434,9 +434,24 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
     );
   }
 
+  // Effect to hide global Header/Footer for clean view
+  React.useEffect(() => {
+    if (isLinkExterno) {
+      const header = document.querySelector('header');
+      const footer = document.querySelector('footer');
+      if (header) header.style.display = 'none';
+      if (footer) footer.style.display = 'none';
+      
+      return () => {
+        if (header) header.style.display = '';
+        if (footer) footer.style.display = '';
+      };
+    }
+  }, [isLinkExterno]);
+
   if (isLinkExterno) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-gray-50 z-[9999] flex items-center justify-center p-4">
         <div className="max-w-md w-full animate-in">
           <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/5 border border-gray-100 flex flex-col items-center">
             {/* Logo Centralizada */}
@@ -445,11 +460,14 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
             </div>
 
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">
-                {evento.nome.toUpperCase().includes('AV1') ? 'Acesse sua AV1' : t(evento.nome)}
+              <div className="size-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-sm mx-auto">
+                <span className="material-symbols-outlined text-3xl font-black">link</span>
+              </div>
+              <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">
+                Acesso ao Link
               </h2>
-              <p className="text-gray-500 text-sm">
-                {t('Informe sua matrícula abaixo para acessar.')}
+              <p className="text-gray-500 text-sm leading-relaxed">
+                Digite sua matrícula abaixo para registrar seu acesso e ser redirecionado(a) imediatamente.
               </p>
             </div>
 
@@ -480,8 +498,8 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
                 Acesso Institucional Seguro
               </p>
               
-              <div className="px-4 py-1.5 bg-primary/5 border border-primary/10 rounded-full flex items-center gap-2 animate-pulse-subtle">
-                <span className="size-2 bg-primary rounded-full"></span>
+              <div className="px-4 py-1.5 bg-primary/5 border border-primary/10 rounded-full flex items-center gap-2">
+                <span className="size-2 bg-primary rounded-full animate-pulse"></span>
                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">
                   {evento.inscritos.length} {evento.inscritos.length === 1 ? 'ACESSO REGISTRADO' : 'ACESSOS REGISTRADOS'}
                 </span>
