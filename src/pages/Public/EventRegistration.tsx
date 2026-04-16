@@ -463,6 +463,8 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
                   setFormData({ ...formData, matricula: val });
                 }}
                 maxLength={6}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 required
               />
 
