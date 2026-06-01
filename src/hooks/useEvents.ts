@@ -56,6 +56,11 @@ export const useStore = () => {
     await loadEvents();
   };
 
+  const reabrirEvento = async (id: string) => {
+    await eventService.reopenEvent(id);
+    await loadEvents();
+  };
+
   const deleteEvento = async (id: string) => {
     await eventService.deleteEvent(id);
     await loadEvents();
@@ -100,6 +105,7 @@ export const useStore = () => {
     addEvento,
     updateEvento,
     encerrarEvento,
+    reabrirEvento,
     deleteEvento,
     registrarInscrito,
     deleteInscrito,

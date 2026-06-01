@@ -20,7 +20,7 @@ const AdminEventForm: React.FC<AdminEventFormProps> = ({ onSave, onUpload, initi
     data: '',
     horario: '',
     descricao: '',
-    local: 'Auditório UNINASSAU Olinda',
+    local: 'Auditório UNINASSAU Boa Viagem',
     imagem: '',
     tipo: 'interno' as 'interno' | 'externo' | 'mobilidade' | 'link_externo',
     linkExterno: ''

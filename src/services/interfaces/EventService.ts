@@ -6,6 +6,7 @@ export interface EventService {
     createEvent(evento: Omit<Evento, 'id' | 'inscritos' | 'encerrado'>): Promise<Evento>;
     updateEvent(evento: Evento): Promise<Evento>;
     closeEvent(id: string): Promise<void>;
+    reopenEvent(id: string): Promise<void>;
     deleteEvent(id: string): Promise<void>;
     registerSubscriber(eventoId: string, inscrito: Omit<Inscrito, 'id' | 'dataInscricao'>): Promise<Inscrito>;
     deleteRegistration(id: string): Promise<void>;
