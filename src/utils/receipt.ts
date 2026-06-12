@@ -151,7 +151,7 @@ const generateCertificate = async (evento: Evento, inscrito: Inscrito, onSuccess
                     </div>
 
                     <div style="text-align: center;">
-                        <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Olinda, ${new Date().toLocaleDateString('pt-BR')}</p>
+                        <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Recife, ${new Date().toLocaleDateString('pt-BR')}</p>
                         <p style="font-size: 8px; color: #999; text-transform: uppercase; letter-spacing: 1px;">Código de Autenticação: ${inscrito.id.substring(0, 8).toUpperCase()}</p>
                     </div>
                 </div>

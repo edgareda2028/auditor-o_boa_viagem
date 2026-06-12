@@ -235,6 +235,16 @@ export class SupabaseEventService implements EventService {
         if (error) throw error;
     }
 
+    async reopenEvent(id: string): Promise<void> {
+        if (!supabase) throw new Error('Supabase não configurado.');
+        const { error } = await supabase
+            .from('events')
+            .update({ status: 'ativo' })
+            .eq('id', id);
+
+        if (error) throw error;
+    }
+
     async deleteEvent(id: string): Promise<void> {
         if (!supabase) throw new Error('Supabase não configurado.');
         const { error } = await supabase

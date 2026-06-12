@@ -2,13 +2,28 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Evento } from '../../types';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 
 interface AdminArchiveProps {
     eventos: Evento[];
+    onReopen: (id: string) => void;
 }
 
-const AdminArchive: React.FC<AdminArchiveProps> = ({ eventos }) => {
+const AdminArchive: React.FC<AdminArchiveProps> = ({ eventos, onReopen }) => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedEvento, setSelectedEvento] = useState<Evento | null>(null);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+    const handleRestoreClick = (evento: Evento) => {
+        setSelectedEvento(evento);
+        setIsConfirmOpen(true);
+    };
+
+    const handleConfirmRestore = () => {
+        if (selectedEvento) {
+            onReopen(selectedEvento.id);
+        }
+    };
 
     const archivedEventos = eventos.filter(e =>
         e.encerrado && e.nome.toLowerCase().includes(searchTerm.toLowerCase())
@@ -101,13 +116,22 @@ const AdminArchive: React.FC<AdminArchiveProps> = ({ eventos }) => {
                                         </span>
                                     </td>
                                     <td className="px-8 py-6 text-right">
-                                        <Link
-                                            to={`/admin/evento/${evento.id}`}
-                                            className="bg-gray-100 text-gray-700 hover:bg-primary hover:text-white px-4 py-2 rounded-xl text-xs font-black transition-all inline-flex items-center gap-1"
-                                        >
-                                            VER REGISTROS
-                                            <span className="material-symbols-outlined text-sm">visibility</span>
-                                        </Link>
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => handleRestoreClick(evento)}
+                                                className="bg-green-50 text-green-600 hover:bg-green-600 hover:text-white px-4 py-2 rounded-xl text-xs font-black transition-all inline-flex items-center gap-1 border border-green-100"
+                                            >
+                                                RESTAURAR
+                                                <span className="material-symbols-outlined text-sm">restore</span>
+                                            </button>
+                                            <Link
+                                                to={`/admin/evento/${evento.id}`}
+                                                className="bg-gray-100 text-gray-700 hover:bg-primary hover:text-white px-4 py-2 rounded-xl text-xs font-black transition-all inline-flex items-center gap-1"
+                                            >
+                                                VER REGISTROS
+                                                <span className="material-symbols-outlined text-sm">visibility</span>
+                                            </Link>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -125,6 +149,19 @@ const AdminArchive: React.FC<AdminArchiveProps> = ({ eventos }) => {
                     </table>
                 </div>
             </div>
+            <ConfirmDialog
+                isOpen={isConfirmOpen}
+                onClose={() => {
+                    setIsConfirmOpen(false);
+                    setSelectedEvento(null);
+                }}
+                onConfirm={handleConfirmRestore}
+                title="Restaurar Evento"
+                message={`Deseja realmente restaurar o evento "${selectedEvento?.nome}"? Ele voltará a ficar ativo e os participantes poderão continuar realizando inscrições e check-in com o mesmo QR Code.`}
+                confirmText="Restaurar"
+                cancelText="Cancelar"
+                type="info"
+            />
         </div>
     );
 };

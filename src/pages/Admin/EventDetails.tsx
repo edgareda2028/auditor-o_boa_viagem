@@ -13,12 +13,13 @@ import QRCodeEditorModal from '../../components/QRCodeEditorModal';
 interface AdminEventDetailsProps {
   eventos: Evento[];
   onEnd: (id: string) => void;
+  onReopen: (id: string) => void;
   onDelete: (id: string) => void;
   onDeleteRegistration: (id: string) => Promise<void>;
   onCheckin: (token: string) => Promise<{ success: boolean; message: string }>;
 }
 
-const AdminEventDetails: React.FC<AdminEventDetailsProps> = ({ eventos, onEnd, onDelete, onDeleteRegistration, onCheckin }) => {
+const AdminEventDetails: React.FC<AdminEventDetailsProps> = ({ eventos, onEnd, onReopen, onDelete, onDeleteRegistration, onCheckin }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const evento = eventos.find(e => e.id === id);
@@ -121,6 +122,16 @@ const AdminEventDetails: React.FC<AdminEventDetailsProps> = ({ eventos, onEnd, o
       message: 'CONFIRMAÇÃO: Encerrar o registro de presença? Ninguém mais poderá confirmar participação online.',
       onConfirm: () => onEnd(evento.id),
       type: 'warning'
+    });
+  };
+
+  const handleReabrir = () => {
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Restaurar Evento',
+      message: 'CONFIRMAÇÃO: Deseja realmente restaurar este evento? Ele ficará ativo novamente para inscrições e o check-in online continuará funcionando com os mesmos QR Codes já impressos.',
+      onConfirm: () => onReopen(evento.id),
+      type: 'info'
     });
   };
 
@@ -376,7 +387,15 @@ const AdminEventDetails: React.FC<AdminEventDetailsProps> = ({ eventos, onEnd, o
             <span className="material-symbols-outlined text-lg">print</span>
             Imprimir
           </button>
-          {!evento.encerrado && (
+          {evento.encerrado ? (
+            <button
+              onClick={handleReabrir}
+              className="col-span-2 sm:col-auto bg-green-50 text-green-600 border-2 border-green-50 px-4 md:px-5 py-2.5 rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-green-100 transition-colors flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined text-lg">restore</span>
+              Restaurar Evento
+            </button>
+          ) : (
             <button
               onClick={handleEncerrar}
               className="col-span-2 sm:col-auto bg-red-50 text-red-600 border-2 border-red-50 px-4 md:px-5 py-2.5 rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-red-100 transition-colors"
