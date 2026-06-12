@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Evento } from '../../types';
 import logo from '../../assets/img/logo.png';
 import { useLanguage } from '../../hooks/useLanguage';
+import { parseLocalDate } from '../../utils/date';
 
 interface PublicEventListProps {
   eventos: Evento[];
@@ -23,8 +24,8 @@ const PublicEventList: React.FC<PublicEventListProps> = ({ eventos }) => {
 
   // Sort by date (nearest first)
   const sortedEvents = [...activeEvents].sort((a, b) => {
-    const dateA = new Date(a.data).getTime();
-    const dateB = new Date(b.data).getTime();
+    const dateA = parseLocalDate(a.data).getTime();
+    const dateB = parseLocalDate(b.data).getTime();
     return dateA - dateB;
   });
 
@@ -41,7 +42,7 @@ const PublicEventList: React.FC<PublicEventListProps> = ({ eventos }) => {
 
     let matchesDate = true;
     if (dateFilter !== 'all') {
-      const eventDate = new Date(evento.data);
+      const eventDate = parseLocalDate(evento.data);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -196,7 +197,7 @@ const PublicEventList: React.FC<PublicEventListProps> = ({ eventos }) => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredEvents.map(evento => {
-              const eventDate = new Date(evento.data);
+              const eventDate = parseLocalDate(evento.data);
               const day = eventDate.getDate();
               const month = eventDate.toLocaleDateString(locale, { month: 'short' }).replace('.', '').toUpperCase();
 

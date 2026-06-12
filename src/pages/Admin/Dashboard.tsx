@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Evento } from '../../types';
+import { parseLocalDate } from '../../utils/date';
 
 interface AdminDashboardProps {
   eventos: Evento[];
@@ -15,9 +16,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ eventos }) => {
   // Apply date filter
   const dateFilteredEventos = eventos.filter(e => {
     if (!dateStart && !dateEnd) return true;
-    const eventDate = new Date(e.data);
-    const start = dateStart ? new Date(dateStart) : null;
-    const end = dateEnd ? new Date(dateEnd) : null;
+    const eventDate = parseLocalDate(e.data);
+    const start = dateStart ? parseLocalDate(dateStart) : null;
+    const end = dateEnd ? parseLocalDate(dateEnd) : null;
 
     if (start && end) {
       return eventDate >= start && eventDate <= end;
@@ -273,7 +274,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ eventos }) => {
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="text-sm font-bold text-gray-700">{new Date(evento.data).toLocaleDateString('pt-BR')}</p>
+                    <p className="text-sm font-bold text-gray-700">{parseLocalDate(evento.data).toLocaleDateString('pt-BR')}</p>
                     <p className="text-xs text-gray-400">{evento.horario}</p>
                   </td>
                   <td className="px-8 py-6">

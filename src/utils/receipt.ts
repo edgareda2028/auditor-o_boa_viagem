@@ -1,6 +1,7 @@
 import QRCode from 'qrcode';
 import { Evento, Inscrito } from '../types';
 import logo from '../assets/img/logo.png';
+import { parseLocalDate } from './date';
 
 export const generateReceipt = async (evento: Evento, inscrito: Inscrito, onSuccess?: () => void) => {
     const primaryColor = '#004a99';
@@ -59,7 +60,7 @@ export const generateReceipt = async (evento: Evento, inscrito: Inscrito, onSucc
 
                 <div style="margin-bottom: 30px;">
                     <p style="color: #999; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px;">Data e Horário</p>
-                    <p style="color: ${secondaryColor}; font-size: 15px; font-weight: 700; margin: 0;">${new Date(evento.data).toLocaleDateString('pt-BR')} às ${evento.horario}</p>
+                    <p style="color: ${secondaryColor}; font-size: 15px; font-weight: 700; margin: 0;">${parseLocalDate(evento.data).toLocaleDateString('pt-BR')} às ${evento.horario}</p>
                 </div>
 
                 <div style="margin-bottom: 30px;">
@@ -137,7 +138,7 @@ const generateCertificate = async (evento: Evento, inscrito: Inscrito, onSuccess
                     <p style="font-size: 32px; font-family: 'Times New Roman', serif; font-weight: bold; color: ${primaryColor}; margin: 10px 0;">${inscrito.nomeCompleto.toUpperCase()}</p>
                     <p style="font-size: 18px; margin: 0;">
                         participou do evento <strong style="color: ${primaryColor};">${evento.nome}</strong> 
-                        realizado em <strong>${new Date(evento.data).toLocaleDateString('pt-BR')}</strong> 
+                        realizado em <strong>${parseLocalDate(evento.data).toLocaleDateString('pt-BR')}</strong> 
                         no <strong>${evento.local}</strong>, com registro de presença validado às 
                         ${inscrito.checkinDate ? new Date(inscrito.checkinDate).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--:--'}.
                     </p>
@@ -427,7 +428,7 @@ export const generateEventRedirectQRCode = async (
             doc.setTextColor(148, 163, 184);
             doc.setFont('helvetica', 'normal');
             doc.text('Sistema de Gestão de Eventos UNINASSAU', pageWidth / 2, yPos + footerHeight + 8, { align: 'center' });
-            const eventInfo = `${new Date(evento.data).toLocaleDateString('pt-BR')} às ${evento.horario} • ${evento.local}`;
+            const eventInfo = `${parseLocalDate(evento.data).toLocaleDateString('pt-BR')} às ${evento.horario} • ${evento.local}`;
             doc.text(eventInfo, pageWidth / 2, yPos + footerHeight + 13, { align: 'center' });
         }
 

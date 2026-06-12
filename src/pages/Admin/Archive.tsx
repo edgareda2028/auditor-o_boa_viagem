@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Evento } from '../../types';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
+import { parseLocalDate } from '../../utils/date';
 
 interface AdminArchiveProps {
     eventos: Evento[];
@@ -99,7 +100,7 @@ const AdminArchive: React.FC<AdminArchiveProps> = ({ eventos, onReopen }) => {
                                         <p className="text-xs text-gray-400 font-medium">{evento.local}</p>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <p className="text-sm font-bold text-gray-700">{new Date(evento.data).toLocaleDateString('pt-BR')}</p>
+                                        <p className="text-sm font-bold text-gray-700">{parseLocalDate(evento.data).toLocaleDateString('pt-BR')}</p>
                                         <p className="text-xs text-gray-400">{evento.horario}</p>
                                     </td>
                                     <td className="px-8 py-6">

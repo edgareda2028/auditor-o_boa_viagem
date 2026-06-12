@@ -9,6 +9,7 @@ import { generateReceipt, generateEventRedirectQRCode } from '../../utils/receip
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import AlertDialog from '../../components/ui/AlertDialog';
 import QRCodeEditorModal from '../../components/QRCodeEditorModal';
+import { parseLocalDate } from '../../utils/date';
 
 interface AdminEventDetailsProps {
   eventos: Evento[];
@@ -459,7 +460,7 @@ const AdminEventDetails: React.FC<AdminEventDetailsProps> = ({ eventos, onEnd, o
                 </div>
                 <div>
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Data Programada</p>
-                  <p className="text-sm font-bold text-gray-800">{new Date(evento.data).toLocaleDateString('pt-BR')}</p>
+                  <p className="text-sm font-bold text-gray-800">{parseLocalDate(evento.data).toLocaleDateString('pt-BR')}</p>
                 </div>
               </div>
 
@@ -586,7 +587,7 @@ const AdminEventDetails: React.FC<AdminEventDetailsProps> = ({ eventos, onEnd, o
               </div>
               <h2 className="text-2xl font-black uppercase mb-2">{evento.nome}</h2>
               <div className="flex justify-center gap-6 text-sm font-bold text-gray-600">
-                <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">calendar_month</span> {new Date(evento.data).toLocaleDateString('pt-BR')}</span>
+                <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">calendar_month</span> {parseLocalDate(evento.data).toLocaleDateString('pt-BR')}</span>
                 <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">schedule</span> {evento.horario}</span>
                 <span className="flex items-center gap-1"><span className="material-symbols-outlined text-sm">location_on</span> {evento.local}</span>
               </div>

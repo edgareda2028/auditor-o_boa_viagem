@@ -10,8 +10,8 @@ import QRCode from 'qrcode';
 import logo from '../../assets/img/logo.png';
 import { generateReceipt } from '../../utils/receipt';
 import AlertDialog from '../../components/ui/AlertDialog';
-import { useLanguage } from '../../hooks/useLanguage';
 import { PhoneInputWithCountry } from '../../components/ui/PhoneInputWithCountry';
+import { parseLocalDate } from '../../utils/date';
 
 interface PublicEventRegistrationProps {
   eventos: Evento[];
@@ -24,7 +24,7 @@ const COURSES = [
   "BIOMEDICINA",
   "CIÊNCIAS AERONÁUTICAS",
   "CIÊNCIAS CONTÁBEIS",
-  "CST ANÁLISE E DESENVOLVIMENTO DE SISTEMAS",
+  "ANÁLISE E DESENVOLVIMENTO DE SISTEMAS",
   "DIREITO",
   "ENFERMAGEM",
   "FARMÁCIA",
@@ -552,7 +552,7 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('when')}</p>
-                    <p className="text-base font-black text-gray-800">{new Date(evento.data).toLocaleDateString(locale)}</p>
+                    <p className="text-base font-black text-gray-800">{parseLocalDate(evento.data).toLocaleDateString(locale)}</p>
                     <p className="text-xs font-bold text-gray-500">{evento.horario}</p>
                   </div>
                 </div>
