@@ -612,13 +612,12 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
                 {!isExterno ? (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <PhoneInputWithCountry
+                      <Input
                         label="Telefone"
+                        placeholder="(00) 00000-0000"
                         value={formData.telefone}
-                        onChange={val => setFormData({ ...formData, telefone: val })}
-                        onCountryChange={country => setFormData(prev => ({ ...prev, pais: country }))}
-                        countryName={formData.pais}
-                        required={!(isMobilidade && formData.isEstrangeiro)}
+                        onChange={e => setFormData({ ...formData, telefone: maskPhone(e.target.value) })}
+                        required
                       />
                       {!(isMobilidade && formData.isEstrangeiro) && (
                         <Input
@@ -692,14 +691,24 @@ const PublicEventRegistration: React.FC<PublicEventRegistrationProps> = ({ event
                   </>
                 ) : (
                   <>
-                    <PhoneInputWithCountry
-                      label="Telefone"
-                      value={formData.telefone}
-                      onChange={val => setFormData({ ...formData, telefone: val })}
-                      onCountryChange={country => setFormData(prev => ({ ...prev, pais: country }))}
-                      countryName={formData.pais}
-                      required
-                    />
+                    {isMobilidade ? (
+                      <PhoneInputWithCountry
+                        label="Telefone"
+                        value={formData.telefone}
+                        onChange={val => setFormData({ ...formData, telefone: val })}
+                        onCountryChange={country => setFormData(prev => ({ ...prev, pais: country }))}
+                        countryName={formData.pais}
+                        required
+                      />
+                    ) : (
+                      <Input
+                        label="Telefone"
+                        placeholder="(00) 00000-0000"
+                        value={formData.telefone}
+                        onChange={e => setFormData({ ...formData, telefone: maskPhone(e.target.value) })}
+                        required
+                      />
+                    )}
 
                     {!(isMobilidade && formData.isEstrangeiro) && (
                       <>
